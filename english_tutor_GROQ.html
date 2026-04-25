@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alex — English Tutor</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Sora', sans-serif;
+    background: #0f0f13;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  #app {
+    width: 100%;
+    max-width: 680px;
+    background: #1a1a24;
+    border-radius: 20px;
+    border: 1px solid #2a2a3a;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 600px;
+    max-height: 92vh;
+  }
+
+  /* HEADER */
+  #header {
+    padding: 16px 20px;
+    background: #13131c;
+    border-bottom: 1px solid #2a2a3a;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+  .hav {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: linear-gradient(135deg, #7F77DD, #534AB7);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+  .hname { font-size: 15px; font-weight: 600; color: #f0f0f8; }
+  .hsub { font-size: 11px; color: #6b6b8a; margin-top: 1px; }
+  .hdot-wrap { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+  .hdot { width: 8px; height: 8px; border-radius: 50%; background: #1D9E75; }
+  .hstatus { font-size: 11px; color: #1D9E75; }
+
+  /* API KEY SCREEN */
+  #apikey-screen {
+    padding: 32px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    flex: 1;
+  }
+  .api-title { font-size: 20px; font-weight: 600; color: #f0f0f8; }
+  .api-desc { font-size: 13px; color: #8888aa; line-height: 1.7; }
+  .api-desc a { color: #7F77DD; }
+  .api-steps { background: #13131c; border-radius: 12px; padding: 16px 18px; border: 1px solid #2a2a3a; }
+  .api-step { font-size: 12.5px; color: #9999bb; padding: 5px 0; border-bottom: 1px solid #2a2a3a; line-height: 1.5; }
+  .api-step:last-child { border-bottom: none; }
+  .api-step strong { color: #c5c5e8; }
+  .api-input-wrap { display: flex; gap: 10px; }
+  #api-input {
+    flex: 1; background: #13131c; border: 1px solid #2a2a3a;
+    border-radius: 10px; padding: 11px 14px; color: #f0f0f8;
+    font-family: 'Sora', sans-serif; font-size: 13px; outline: none;
+  }
+  #api-input:focus { border-color: #7F77DD; }
+  #api-input::placeholder { color: #444460; }
+  #api-btn {
+    background: #534AB7; color: white; border: none;
+    border-radius: 10px; padding: 11px 20px; cursor: pointer;
+    font-family: 'Sora', sans-serif; font-size: 13px; font-weight: 500;
+    transition: background 0.15s;
+    white-space: nowrap;
+  }
+  #api-btn:hover { background: #3C3489; }
+  .api-note { font-size: 11px; color: #555570; }
+
+  /* TOPIC SCREEN */
+  #topic-screen {
+    padding: 24px 20px;
+    display: none;
+    flex-direction: column;
+    gap: 16px;
+    flex: 1;
+    overflow-y: auto;
+  }
+  .topic-hello { font-size: 18px; font-weight: 600; color: #f0f0f8; }
+  .topic-sub { font-size: 13px; color: #8888aa; line-height: 1.6; }
+  .topic-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .topic-btn {
+    background: #13131c; border: 1px solid #2a2a3a;
+    border-radius: 12px; padding: 14px 16px; cursor: pointer;
+    text-align: left; transition: border-color 0.15s, background 0.15s;
+    font-family: 'Sora', sans-serif;
+  }
+  .topic-btn:hover { border-color: #7F77DD; background: #1e1e30; }
+  .topic-emoji { font-size: 22px; display: block; margin-bottom: 8px; }
+  .topic-label { font-size: 13px; font-weight: 500; color: #d0d0f0; display: block; }
+  .topic-desc { font-size: 11px; color: #6b6b8a; display: block; margin-top: 3px; }
+
+  /* CHAT SCREEN */
+  #chat-screen {
+    display: none;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  #topic-bar {
+    padding: 8px 20px;
+    background: #1e1e2e;
+    border-bottom: 1px solid #2a2a3a;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .topic-bar-text { font-size: 12px; color: #7F77DD; font-weight: 500; }
+  #change-btn { font-size: 11px; color: #555570; background: none; border: none; cursor: pointer; font-family: 'Sora', sans-serif; }
+  #change-btn:hover { color: #9999bb; }
+
+  #messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  #messages::-webkit-scrollbar { width: 4px; }
+  #messages::-webkit-scrollbar-track { background: transparent; }
+  #messages::-webkit-scrollbar-thumb { background: #2a2a3a; border-radius: 2px; }
+
+  .msg-row { display: flex; gap: 10px; align-items: flex-start; }
+  .msg-row.user { flex-direction: row-reverse; }
+  .mav {
+    width: 30px; height: 30px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600; flex-shrink: 0; margin-top: 2px;
+  }
+  .mav.bot { background: #2a2040; color: #7F77DD; }
+  .mav.user { background: #0d2a20; color: #1D9E75; }
+  .mcontent { max-width: 80%; display: flex; flex-direction: column; gap: 6px; }
+  .msg-row.user .mcontent { align-items: flex-end; }
+
+  .bubble {
+    padding: 11px 14px;
+    border-radius: 16px;
+    font-size: 13.5px;
+    line-height: 1.6;
+  }
+  .bubble.bot {
+    background: #22222e;
+    border: 1px solid #2a2a3a;
+    color: #d0d0e8;
+    border-radius: 4px 16px 16px 16px;
+  }
+  .bubble.user {
+    background: #2a2040;
+    border: 1px solid #4a40a0;
+    color: #c5c0f0;
+    border-radius: 16px 4px 16px 16px;
+  }
+
+  .correction-box {
+    background: #13131c;
+    border: 1px solid #2a2a3a;
+    border-left: 2px solid #7F77DD;
+    border-radius: 10px;
+    padding: 10px 13px;
+    font-size: 12.5px;
+    color: #9999bb;
+    line-height: 1.65;
+    max-width: 100%;
+  }
+  .correction-box .ok { color: #1D9E75; font-weight: 500; }
+  .correction-box .err { color: #D85A30; text-decoration: line-through; }
+  .correction-box .fix { color: #1D9E75; font-weight: 500; }
+  .correction-box .it { color: #7F77DD; }
+  .correction-box .section { margin-bottom: 8px; }
+  .correction-box .section:last-child { margin-bottom: 0; }
+  .section-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: #555570; margin-bottom: 3px; font-weight: 500; }
+
+  .typing { display: flex; gap: 5px; align-items: center; padding: 4px 0; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: #444460; animation: bounce 1.2s infinite; }
+  .dot:nth-child(2) { animation-delay: 0.2s; }
+  .dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-7px)} }
+
+  /* INPUT */
+  #input-area {
+    padding: 12px 16px;
+    border-top: 1px solid #2a2a3a;
+    background: #13131c;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .quick-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+  .qbtn {
+    font-size: 11.5px; padding: 5px 11px; border-radius: 20px;
+    border: 1px solid #2a2a3a; background: #1a1a24;
+    color: #7777aa; cursor: pointer; font-family: 'Sora', sans-serif;
+    transition: all 0.12s;
+  }
+  .qbtn:hover { border-color: #7F77DD; color: #AFA9EC; }
+
+  .input-row { display: flex; gap: 10px; align-items: flex-end; }
+  #msg-input {
+    flex: 1; background: #22222e; border: 1px solid #2a2a3a;
+    border-radius: 16px; padding: 10px 15px;
+    font-family: 'Sora', sans-serif; font-size: 13.5px;
+    color: #e0e0f8; outline: none; resize: none;
+    min-height: 40px; max-height: 100px; line-height: 1.5;
+  }
+  #msg-input:focus { border-color: #534AB7; }
+  #msg-input::placeholder { color: #444460; }
+  #send-btn {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: #534AB7; border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: background 0.15s, transform 0.1s;
+  }
+  #send-btn:hover { background: #3C3489; }
+  #send-btn:active { transform: scale(0.93); }
+  #send-btn:disabled { background: #2a2a3a; cursor: default; }
+  .send-ico { width: 16px; height: 16px; fill: white; }
+
+  .error-msg { color: #D85A30; font-size: 12px; padding: 6px 10px; background: #2a1810; border-radius: 8px; border: 1px solid #4a2010; }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <div id="header">
+    <div class="hav">🎓</div>
+    <div>
+      <div class="hname">Alex — English Tutor</div>
+      <div class="hsub">Parla in inglese, ti correggo in italiano</div>
+    </div>
+    <div class="hdot-wrap">
+      <div class="hdot"></div>
+      <div class="hstatus">online</div>
+    </div>
+  </div>
+
+  <!-- API KEY SCREEN -->
+  <div id="apikey-screen">
+    <div class="api-title">🔑 Inserisci la tua API Key Groq</div>
+    <div class="api-desc">
+      Groq è <strong style="color:#c5c5e8;">100% gratuito</strong>, velocissimo e non richiede carta di credito!
+    </div>
+    <div class="api-steps">
+      <div class="api-step">1. Vai su <strong><a href="https://console.groq.com" target="_blank">console.groq.com</a></strong></div>
+      <div class="api-step">2. Registrati gratis con Google o email</div>
+      <div class="api-step">3. Clicca su <strong>"API Keys"</strong> nel menu a sinistra</div>
+      <div class="api-step">4. Clicca <strong>"Create API Key"</strong> e copia la key</div>
+      <div class="api-step">5. Incollala qui sotto e clicca Entra</div>
+    </div>
+    <div class="api-input-wrap">
+      <input type="password" id="api-input" placeholder="gsk_..." />
+      <button id="api-btn" onclick="saveApiKey()">Entra →</button>
+    </div>
+    <div class="api-note">🔒 La key viene salvata solo nel tuo browser e non viene mai inviata ad altri server oltre Groq.</div>
+  </div>
+
+  <!-- TOPIC SCREEN -->
+  <div id="topic-screen">
+    <div class="topic-hello">👋 Ciao! Scegli un argomento</div>
+    <div class="topic-sub">Scrivi in inglese (anche con errori!) e Alex ti correggerà e ti spiegherà tutto in italiano.</div>
+    <div class="topic-grid">
+      <button class="topic-btn" onclick="chooseTopic('Al caffè ☕', 'ordering food and drinks at a café')">
+        <span class="topic-emoji">☕</span>
+        <span class="topic-label">Al caffè</span>
+        <span class="topic-desc">Ordinare, pagare, chiedere</span>
+      </button>
+      <button class="topic-btn" onclick="chooseTopic('Presentarsi 👋', 'introducing yourself, talking about your name, job and hobbies')">
+        <span class="topic-emoji">👋</span>
+        <span class="topic-label">Presentarsi</span>
+        <span class="topic-desc">Nome, lavoro, hobby</span>
+      </button>
+      <button class="topic-btn" onclick="chooseTopic('Indicazioni stradali 🗺️', 'asking and giving directions in a city')">
+        <span class="topic-emoji">🗺️</span>
+        <span class="topic-label">Indicazioni stradali</span>
+        <span class="topic-desc">Come arrivo a...?</span>
+      </button>
+      <button class="topic-btn" onclick="chooseTopic('In hotel 🏨', 'checking in and out at a hotel, asking for services')">
+        <span class="topic-emoji">🏨</span>
+        <span class="topic-label">In hotel</span>
+        <span class="topic-desc">Check-in, camera, servizi</span>
+      </button>
+      <button class="topic-btn" onclick="chooseTopic('Fare shopping 🛍️', 'shopping for clothes, asking about sizes and prices')">
+        <span class="topic-emoji">🛍️</span>
+        <span class="topic-label">Fare shopping</span>
+        <span class="topic-desc">Taglie, prezzi, provare</span>
+      </button>
+      <button class="topic-btn" onclick="chooseTopic('Conversazione libera 💬', 'casual everyday conversation about anything')">
+        <span class="topic-emoji">💬</span>
+        <span class="topic-label">Conversazione libera</span>
+        <span class="topic-desc">Di tutto, senza tema fisso</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- CHAT SCREEN -->
+  <div id="chat-screen">
+    <div id="topic-bar">
+      <span class="topic-bar-text" id="topic-bar-text">📌 Argomento</span>
+      <button id="change-btn" onclick="backToTopics()">↩ Cambia argomento</button>
+    </div>
+    <div id="messages"></div>
+    <div id="input-area">
+      <div class="quick-btns" id="quick-btns"></div>
+      <div class="input-row">
+        <textarea id="msg-input" placeholder="Write in English..." rows="1"></textarea>
+        <button id="send-btn" onclick="sendMsg()">
+          <svg class="send-ico" viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let apiKey = localStorage.getItem('alex_tutor_key_groq') || '';
+let currentTopic = '';
+let currentTopicLabel = '';
+let history = [];
+let isLoading = false;
+
+const SYSTEM = (topic) => `You are Alex, a warm and encouraging English language tutor for Italian native speakers. The user is learning English. The conversation topic is: "${topic}".
+
+ALWAYS respond in this EXACT JSON format, no extra text:
+{
+  "english_reply": "Your reply in English (natural, friendly, 1-3 sentences + a follow-up question)",
+  "has_errors": true or false,
+  "original": "exact text the user wrote (only if has_errors, else empty string)",
+  "corrected": "corrected English version (only if has_errors, else empty string)",
+  "error_explanation": "Spiegazione dell'errore in italiano semplice (only if has_errors, else empty string)",
+  "meaning_it": "Traduzione in italiano di quello che hai risposto (sempre incluso, 1-2 frasi)",
+  "phrases": ["Frase inglese utile 1 — traduzione italiana", "Frase inglese utile 2 — traduzione italiana"]
+}
+
+Rules:
+- If user writes in Italian, gently push them to try English and show them how
+- Be very encouraging, celebrate correct sentences
+- helpful phrases: 2 short expressions with Italian translation separated by em dash
+- english_reply: natural, beginner-intermediate level
+- Return ONLY valid JSON, nothing else`;
+
+function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function init() {
+  if (apiKey) {
+    showTopics();
+  }
+  document.getElementById('msg-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); }
+  });
+  document.getElementById('msg-input').addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+  });
+  document.getElementById('api-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') saveApiKey();
+  });
+}
+
+function saveApiKey() {
+  const val = document.getElementById('api-input').value.trim();
+  if (!val.startsWith('gsk_')) {
+    alert('La API key di Groq deve iniziare con "gsk_". Controllala e riprova!');
+    return;
+  }
+  apiKey = val;
+  localStorage.setItem('alex_tutor_key_groq', apiKey);
+  showTopics();
+}
+
+function showTopics() {
+  document.getElementById('apikey-screen').style.display = 'none';
+  document.getElementById('topic-screen').style.display = 'flex';
+  document.getElementById('chat-screen').style.display = 'none';
+}
+
+function chooseTopic(label, topic) {
+  currentTopic = topic;
+  currentTopicLabel = label;
+  history = [];
+  document.getElementById('topic-screen').style.display = 'none';
+  document.getElementById('chat-screen').style.display = 'flex';
+  document.getElementById('topic-bar-text').textContent = '📌 ' + label;
+  document.getElementById('messages').innerHTML = '';
+  setQuickBtns([
+    { text: '🆘 Non so come dirlo', msg: 'HELP_IT' },
+    { text: "What does that mean?", msg: "What does that mean? Can you explain in Italian?" },
+    { text: "Can you repeat?", msg: "Can you say that again more simply?" },
+  ]);
+  callAlex('START: Greet the user warmly and ask the first question to begin the conversation about the topic. Be brief and friendly.');
+}
+
+function backToTopics() {
+  showTopics();
+}
+
+function addBotMsg(parsed) {
+  const row = document.createElement('div');
+  row.className = 'msg-row bot';
+
+  let correctionHtml = '';
+  if (parsed.has_errors && parsed.original) {
+    correctionHtml = `
+      <div class="section">
+        <div class="section-label">✏️ Correzione</div>
+        Hai scritto: <span class="err">${esc(parsed.original)}</span><br>
+        Corretto: <span class="fix">${esc(parsed.corrected)}</span><br>
+        <span style="color:#8888aa;font-size:12px;">${esc(parsed.error_explanation)}</span>
+      </div>`;
+  } else if (parsed.has_errors === false) {
+    correctionHtml = `<div class="section"><span class="ok">✅ Ottimo! Nessun errore</span></div>`;
+  }
+
+  const meaningHtml = parsed.meaning_it ? `
+    <div class="section">
+      <div class="section-label">🇮🇹 In italiano</div>
+      <span class="it">${esc(parsed.meaning_it)}</span>
+    </div>` : '';
+
+  const phrasesHtml = parsed.phrases && parsed.phrases.length ? `
+    <div class="section">
+      <div class="section-label">💡 Frasi utili</div>
+      ${parsed.phrases.map(p => `<div style="padding:2px 0;color:#9999cc;">${esc(p)}</div>`).join('')}
+    </div>` : '';
+
+  row.innerHTML = `
+    <div class="mav bot">AI</div>
+    <div class="mcontent">
+      <div class="bubble bot">${esc(parsed.english_reply).replace(/\n/g,'<br>')}</div>
+      ${(correctionHtml || meaningHtml || phrasesHtml) ? `<div class="correction-box">${correctionHtml}${meaningHtml}${phrasesHtml}</div>` : ''}
+    </div>`;
+  document.getElementById('messages').appendChild(row);
+  scrollBottom();
+}
+
+function addUserMsg(text) {
+  const row = document.createElement('div');
+  row.className = 'msg-row user';
+  row.innerHTML = `<div class="mav user">Tu</div><div class="mcontent"><div class="bubble user">${esc(text).replace(/\n/g,'<br>')}</div></div>`;
+  document.getElementById('messages').appendChild(row);
+  scrollBottom();
+}
+
+function addTyping() {
+  const row = document.createElement('div');
+  row.className = 'msg-row bot';
+  row.id = 'typing-row';
+  row.innerHTML = `<div class="mav bot">AI</div><div class="mcontent"><div class="bubble bot"><div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div></div>`;
+  document.getElementById('messages').appendChild(row);
+  scrollBottom();
+}
+
+function removeTyping() {
+  const el = document.getElementById('typing-row');
+  if (el) el.remove();
+}
+
+function scrollBottom() {
+  const m = document.getElementById('messages');
+  m.scrollTop = m.scrollHeight;
+}
+
+function setQuickBtns(btns) {
+  const c = document.getElementById('quick-btns');
+  c.innerHTML = '';
+  btns.forEach(b => {
+    const btn = document.createElement('button');
+    btn.className = 'qbtn';
+    btn.textContent = b.text;
+    btn.onclick = () => {
+      if (b.msg === 'HELP_IT') {
+        callAlexHelp();
+      } else {
+        document.getElementById('msg-input').value = b.msg;
+        sendMsg();
+      }
+    };
+    c.appendChild(btn);
+  });
+}
+
+function sendMsg() {
+  const input = document.getElementById('msg-input');
+  const text = input.value.trim();
+  if (!text || isLoading) return;
+  input.value = '';
+  input.style.height = 'auto';
+  addUserMsg(text);
+  callAlex(text);
+}
+
+function callAlexHelp() {
+  addUserMsg("(Non so come rispondere — ho bisogno di aiuto in italiano)");
+  callAlex("HELP: The user doesn't know how to respond. Switch to Italian completely: explain what was just asked, give them 2-3 ready-made English sentences they can use to reply (with Italian translation), then ask the question again in English simply.");
+}
+
+async function callAlex(userMessage) {
+  if (isLoading) return;
+  isLoading = true;
+  document.getElementById('send-btn').disabled = true;
+
+  history.push({ role: 'user', content: userMessage });
+  addTyping();
+
+  try {
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + apiKey
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        max_tokens: 1000,
+        messages: [
+          { role: 'system', content: SYSTEM(currentTopic) },
+          ...history
+        ]
+      })
+    });
+
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.error?.message || 'Errore API Groq');
+    }
+
+    const data = await response.json();
+    const text = data.choices[0].message.content;
+    history.push({ role: 'assistant', content: text });
+
+    let parsed;
+    try {
+      parsed = JSON.parse(text.replace(/```json|```/g,'').trim());
+    } catch(e) {
+      parsed = { english_reply: text, has_errors: false, meaning_it: '', phrases: [] };
+    }
+
+    removeTyping();
+    addBotMsg(parsed);
+
+    setQuickBtns([
+      { text: '🆘 Non so come dirlo', msg: 'HELP_IT' },
+      { text: "What does that mean?", msg: "What does that mean? Explain in Italian please." },
+      { text: "Can you repeat?", msg: "Can you say that again more simply?" },
+    ]);
+
+  } catch(err) {
+    removeTyping();
+    const errRow = document.createElement('div');
+    errRow.className = 'msg-row bot';
+    errRow.innerHTML = `<div class="mav bot">AI</div><div class="mcontent"><div class="error-msg">❌ Errore: ${esc(err.message)}<br><small>Controlla la tua API key nelle impostazioni.</small></div></div>`;
+    document.getElementById('messages').appendChild(errRow);
+    scrollBottom();
+    history.pop();
+  }
+
+  isLoading = false;
+  document.getElementById('send-btn').disabled = false;
+  document.getElementById('msg-input').focus();
+}
+
+init();
+</script>
+</body>
+</html>
